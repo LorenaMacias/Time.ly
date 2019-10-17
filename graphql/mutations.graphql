@@ -1,0 +1,34 @@
+# this is an auto generated file. This will be overwritten
+mutation CreateItem($input: CreateItemInput!) {
+  createItem(input: $input) {
+    id
+    title
+    desc
+    dueDate
+    people
+    priority
+    createdBy
+  }
+}
+mutation UpdateItem($input: UpdateItemInput!) {
+  updateItem(input: $input) {
+    id
+    title
+    desc
+    dueDate
+    people
+    priority
+    createdBy
+  }
+}
+mutation DeleteItem($input: DeleteItemInput!) {
+  deleteItem(input: $input) {
+    id
+    title
+    desc
+    dueDate
+    people
+    priority
+    createdBy
+  }
+}

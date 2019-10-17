@@ -1,0 +1,9 @@
+type item @model{
+      id: ID!
+      title: String!
+      desc: String
+      dueDate: String
+      people: String
+      priority: String
+      createdBy: String
+}

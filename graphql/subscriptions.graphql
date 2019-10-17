@@ -1,0 +1,34 @@
+# this is an auto generated file. This will be overwritten
+subscription OnCreateItem {
+  onCreateItem {
+    id
+    title
+    desc
+    dueDate
+    people
+    priority
+    createdBy
+  }
+}
+subscription OnUpdateItem {
+  onUpdateItem {
+    id
+    title
+    desc
+    dueDate
+    people
+    priority
+    createdBy
+  }
+}
+subscription OnDeleteItem {
+  onDeleteItem {
+    id
+    title
+    desc
+    dueDate
+    people
+    priority
+    createdBy
+  }
+}

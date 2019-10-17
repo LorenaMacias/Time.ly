@@ -1,0 +1,19 @@
+{
+    "timeenv": {
+        "awscloudformation": {
+            "AuthRoleName": "timely-timeenv-20191008210436-authRole",
+            "UnauthRoleArn": "arn:aws:iam::863720528183:role/timely-timeenv-20191008210436-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::863720528183:role/timely-timeenv-20191008210436-authRole",
+            "Region": "us-west-2",
+            "DeploymentBucketName": "timely-timeenv-20191008210436-deployment",
+            "UnauthRoleName": "timely-timeenv-20191008210436-unauthRole",
+            "StackName": "timely-timeenv-20191008210436",
+            "StackId": "arn:aws:cloudformation:us-west-2:863720528183:stack/timely-timeenv-20191008210436/e953b480-ea49-11e9-8419-0ab7a7abe28a"
+        },
+        "categories": {
+            "auth": {
+                "timelyCognito": {}
+            }
+        }
+    }
+}
