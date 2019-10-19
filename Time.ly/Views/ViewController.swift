@@ -15,11 +15,11 @@ class ViewController: UIViewController {
 
 
     var notesArray : [[String: Any]] = []
-    var user : String = ""
+    var email : String = ""
+    var emailToSend : String = ""
 
     typealias FinishedDownload = () -> ()
 
-    
     
     @IBOutlet weak var tableView: UITableView!
     
@@ -27,19 +27,22 @@ class ViewController: UIViewController {
     @IBOutlet weak var addItemUIBTN: UIButton!
     
     override func viewDidLoad() {
+        print("viewDidLoad was called here")
             super.viewDidLoad()
             self.userSignIn()
-            self.setItem(completion: {(notesArray) in
-                print("Hello the count is \(notesArray.count)")
-            } )
+            self.setUser(completion: {(email) in
+                self.emailToSend = self.email
+                    print("email is " + self.emailToSend)
+
+            })
+            self.setItem()
+
             self.tableView.register(UINib(nibName: "CustomCellTableViewCell", bundle: .main
             ), forCellReuseIdentifier: "CustomCellTableViewCell")
             btnUI(btn: addItemUIBTN)
-        let sendValue = AddItemViewController();
-      
-        
 
     }
+    //customizes button
     func btnUI(btn : UIButton){
         btn.layer.masksToBounds = false
         btn.layer.cornerRadius = addItemUIBTN.frame.width / 2
@@ -48,6 +51,7 @@ class ViewController: UIViewController {
         btn.layer.shadowRadius = 6.0
         btn.layer.shadowOpacity = 0.5
     }
+    //customizes boilerplate Cognito login
     func setCustomUI(){
         AWSMobileClient.default()
             .showSignIn(navigationController: self.navigationController!,
@@ -57,8 +61,19 @@ class ViewController: UIViewController {
                             backgroundColor: UIColor(red:0.00, green:0.50, blue:0.50, alpha:1.0))) { (result, err) in
         }
     }
+    //handles issue of email being setting to Nil
+    func setUser(completion : @escaping(_ EMAIL : String ) -> Void){
+        AWSMobileClient.sharedInstance().getTokens{ (tokens, error) in
+            if let error = error { print(error.localizedDescription)}
+            if let tokens = tokens {
+                self.email = tokens.idToken?.claims?["email"] as! String
+                completion(self.email)
+               
+            }
+        }
+    }
+    //handles user sign in and authentication
     func userSignIn(){
-
         AWSMobileClient.default().initialize { (userState, error) in
             if let userState = userState {
                 switch(userState){
@@ -70,6 +85,12 @@ class ViewController: UIViewController {
                     self.setCustomUI()
                     AWSMobileClient.default().showSignIn(navigationController: self.navigationController!, { (userState, error) in
                         if(error == nil){       //Successful signin
+                            self.setUser(completion: {(email) in
+                                self.emailToSend = self.email
+                                print("email is " + self.emailToSend)
+
+                            })
+
                             DispatchQueue.main.async {
                                 print("User signed in")
                             }
@@ -84,79 +105,95 @@ class ViewController: UIViewController {
                 print(error.localizedDescription)
             }
         }
+
     }
-    func getUser() -> String{
-        //to check if user is logged in with Cognito... not sure if this is necessary
-        var user = ((AWSCognitoUserPoolsSignInProvider.sharedInstance()
-            .getUserPool()
-            .currentUser()?
-            .username)!)
-        print("username is:  \(user)")
-        
-        return user
+    //allows us to send data to our other VC, passing email
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?)
+    {
+        if segue.destination is AddItemViewController
+        {
+            let vc = segue.destination as? AddItemViewController
+            self.setUser(completion: {(email) in
+
+                vc?.userEmail = self.email
+            })
+        }
     }
-    
     
     @IBAction func signOutBtn(_ sender: Any) {
+//        self.notesArray = []
         AWSMobileClient.sharedInstance().signOut()
         self.userSignIn()
+        
+        
 
     }
-
-func setItem(completion : @escaping(_ nameArray : [[String: Any]] ) -> Void ){
+    //reads from AWS DynamoDB to store user information in dict
+    func setItem(){
         //Explicit GET
-        if let urlToPass = URL(string: "https://cwkz97wm3b.execute-api.us-west-2.amazonaws.com/beta/all") {
-        var urlRequest = URLRequest(url: urlToPass, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
-        urlRequest.httpMethod = "GET"
-
-
-        let taskWithRequest = URLSession.init(configuration: .default)
-        taskWithRequest.dataTask(with: urlRequest) { (data, response, error) in
-            if let response = response {
-                print(response)
-            }
-            if let data = data {
+        
+        self.setUser(completion: {(email) in
+            
+            self.emailToSend = self.email
+            
+            
+            var emailDict : [String : String] =  ["email" : self.emailToSend]
+            
+            if let urlToPass = URL(string: "https://cwkz97wm3b.execute-api.us-west-2.amazonaws.com/beta/getusernotes") {
+                var urlRequest = URLRequest(url: urlToPass, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
+                urlRequest.httpMethod = "GET"
                 do {
-                    let json = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.allowFragments )
-
-                    DispatchQueue.main.async{
-                        self.notesArray = json as! [[String : Any]]
-                        completion(self.notesArray)
-                        print("the size es \(self.notesArray.count)")
-                    }
-//                    notesArray[0]["title"] as! String
-
-                    print(json)
-
-                } catch {
+                    urlRequest.httpBody = try JSONSerialization.data(withJSONObject: emailDict, options: JSONSerialization.WritingOptions())
+                    
+                }
+                catch {
                     print(error)
                 }
+                
+                
+                let taskWithRequest = URLSession.init(configuration: .default)
+                taskWithRequest.dataTask(with: urlRequest) { (data, response, error) in
+                    if let response = response {
+                        print(response)
+                    }
+                    if let data = data {
+                        do {
+                            let json = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.allowFragments )
+                            print(json)
+                            self.notesArray = json as! [[String : Any]]
+                            
+                            DispatchQueue.main.async{
+                                self.tableView.reloadData()
+                            }
+                            print(json)
+                        } catch {
+                            print(error)
+                        }
+                    }
+                    }.resume()
             }
-            }.resume()
+            
+        })
+
+        
+       
     }
-}
 
 }
-
+//custome Table View and Cells to display data from AWS DynamoDB
 extension ViewController : UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        var size : Int = 2
-        self.setItem(completion: {(notesArray) in
-            size = notesArray.count
-        } )
-
-        return 2
-
+        return notesArray.count
 }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CustomCellTableViewCell", for: indexPath) as! CustomCellTableViewCell
-        self.setItem(completion: {(notesArray) in
-//            print("Size is \(self.notesArray.count)")
-            cell.titleLabelCell.text = notesArray[indexPath.row]["title"] as! String
-            cell.descLabelCell.text = notesArray[indexPath.row]["desc"] as! String
-            cell.priorityLabelCell.text = notesArray[indexPath.row]["priority"] as! String
-            cell.dateLabelCell.text = notesArray[indexPath.row]["dueDate"] as! String
+        //self.setItem(completion: {(notesArray) in
+            print("Size is \(self.notesArray.count)")
+            cell.titleLabelCell.text = notesArray[indexPath.row]["title"] as? String
+            cell.descLabelCell.text = notesArray[indexPath.row]["desc"] as? String
+            cell.priorityLabelCell.text = notesArray[indexPath.row]["priority"] as? String
+            cell.dateLabelCell.text = notesArray[indexPath.row]["dueDate"] as? String
             cell.priorityLabelCell.isHidden = false
 
 
@@ -174,7 +211,7 @@ extension ViewController : UITableViewDataSource {
                 cell.priorityLabelCell.text = ""
 
             }
-        } )
+       // } )
         return cell
     }
 
