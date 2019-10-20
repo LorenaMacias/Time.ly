@@ -126,9 +126,11 @@ class AddItemViewController: UIViewController {
     }
     //passes user entered information to AWS DynamoDB through our lambda func
     @IBAction func addItemBtn(_ sender: Any) {
-        
         setVariables()
-        if isEmailValid(){
+        parseEmails()
+
+        if isEmailValid() || emailList[0] == "" {
+            print("emaillist size is \(emailList.count)")
             let identifier = UUID().uuidString
             var noteToPass:[String: String] = ["id": identifier, "title": titleText, "desc": descText, "priority": priorityText, "dueDate": date, "createdBy": userEmail, "people": emailList[0]]
             //Explicit GET
@@ -182,16 +184,12 @@ class AddItemViewController: UIViewController {
     
     func parseEmails(){
         var emailTemp : String = ""
-        emailTemp = emailTextField.text ?? "empty"
+        emailTemp = emailTextField.text ?? ""
         self.emailList = emailTemp.components(separatedBy: ", ")
-        for i in emailList{
-            print(i + " ")
-        }
         
     }
     
     func isEmailValid() -> Bool{
-        parseEmails()
         print("inside isemailvalid")
         print("size of emailLIst is \(emailList.count)")
         //check for valid emails
@@ -200,10 +198,8 @@ class AddItemViewController: UIViewController {
             
             let emailPred = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
             if (emailPred.evaluate(with: i)){
-                print("true")
             }
             else{
-                print("its falseeee")
                 return false
             }
         }
