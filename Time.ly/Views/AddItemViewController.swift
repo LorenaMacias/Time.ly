@@ -19,6 +19,7 @@ class AddItemViewController: UIViewController {
     @IBOutlet weak var mediumPriorityBtn: UIButton!
     @IBOutlet weak var lowPriorityBtn: UIButton!
     
+    @IBOutlet weak var emailTextField: UITextField!
     var userEmail : String = ""
 
     
@@ -26,6 +27,8 @@ class AddItemViewController: UIViewController {
     var descText : String = ""
     var priorityText : String = ""
     var date : String = ""
+    var emailList = [String]()
+    
 //    var user : String = ""
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -124,38 +127,46 @@ class AddItemViewController: UIViewController {
     //passes user entered information to AWS DynamoDB through our lambda func
     @IBAction func addItemBtn(_ sender: Any) {
         
-        
         setVariables()
-        let identifier = UUID().uuidString
-        var noteToPass:[String: String] = ["id": identifier, "title": titleText, "desc": descText, "priority": priorityText, "dueDate": date, "createdBy": userEmail]
-        //Explicit GET
-        if let urlToPass = URL(string: "https://cwkz97wm3b.execute-api.us-west-2.amazonaws.com/beta/additem") {
-        var urlRequest = URLRequest(url: urlToPass, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
-        urlRequest.httpMethod = "POST"
-        do{urlRequest.httpBody = try JSONSerialization.data(withJSONObject: noteToPass, options: JSONSerialization.WritingOptions())} catch{
-            print(error)
-        }
-        
-        
-        //urlRequest.allHTTPHeaderFields = ["X-RapidAPI-Host": "restcountries-v1.p.rapidapi.com", "X-RapidAPI-Key": "ddf00969d6msh66c55091085b512p179bbfjsn36f1a8a81ed6"]
-        // https://restcountries-v1.p.rapidapi.com/all
-        
-        let taskWithRequest = URLSession.init(configuration: .default)
-        taskWithRequest.dataTask(with: urlRequest) { (data, response, error) in
-            if let response = response {
-                print(response)
-            }
-            if let data = data {
-                do {
-                    let json = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.allowFragments)
-                    print(json)
-                    
-                } catch {
+        if isEmailValid(){
+            let identifier = UUID().uuidString
+            var noteToPass:[String: String] = ["id": identifier, "title": titleText, "desc": descText, "priority": priorityText, "dueDate": date, "createdBy": userEmail, "people": emailList[0]]
+            //Explicit GET
+            if let urlToPass = URL(string: "https://cwkz97wm3b.execute-api.us-west-2.amazonaws.com/beta/additem") {
+                var urlRequest = URLRequest(url: urlToPass, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
+                urlRequest.httpMethod = "POST"
+                do{urlRequest.httpBody = try JSONSerialization.data(withJSONObject: noteToPass, options: JSONSerialization.WritingOptions())} catch{
                     print(error)
                 }
+                
+                //urlRequest.allHTTPHeaderFields = ["X-RapidAPI-Host": "restcountries-v1.p.rapidapi.com", "X-RapidAPI-Key": "ddf00969d6msh66c55091085b512p179bbfjsn36f1a8a81ed6"]
+                // https://restcountries-v1.p.rapidapi.com/all
+                
+                let taskWithRequest = URLSession.init(configuration: .default)
+                taskWithRequest.dataTask(with: urlRequest) { (data, response, error) in
+                    if let response = response {
+                        print(response)
+                    }
+                    if let data = data {
+                        do {
+                            let json = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.allowFragments)
+                            print(json)
+                            
+                        } catch {
+                            print(error)
+                        }
+                    }
+                    }.resume()
             }
-            }.resume()
         }
+        else{
+            let alert = UIAlertController(title: "Alert", message: "Invalid Email", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default, handler: { _ in
+                NSLog("The \"OK\" alert occured.")
+            }))
+            self.present(alert, animated: true, completion: nil)
+        }
+        
     }
     
     @IBOutlet weak var datePicker: UIDatePicker!
@@ -169,6 +180,35 @@ class AddItemViewController: UIViewController {
         self.date = dateFormatter.string(from: datePicker.date)
     }
     
+    func parseEmails(){
+        var emailTemp : String = ""
+        emailTemp = emailTextField.text ?? "empty"
+        self.emailList = emailTemp.components(separatedBy: ", ")
+        for i in emailList{
+            print(i + " ")
+        }
+        
+    }
     
+    func isEmailValid() -> Bool{
+        parseEmails()
+        print("inside isemailvalid")
+        print("size of emailLIst is \(emailList.count)")
+        //check for valid emails
+        for i in self.emailList{
+            let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+            
+            let emailPred = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
+            if (emailPred.evaluate(with: i)){
+                print("true")
+            }
+            else{
+                print("its falseeee")
+                return false
+            }
+        }
+        print("its trueee")
+        return true
+    }
     
 }

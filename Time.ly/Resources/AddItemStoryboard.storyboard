@@ -96,6 +96,13 @@
                                     <action selector="datePickerChanged:" destination="eW9-9P-yXl" eventType="valueChanged" id="eUG-6k-2sM"/>
                                 </connections>
                             </datePicker>
+                            <textField opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="user@timely.com" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="d7B-58-kAu">
+                                <rect key="frame" x="30" y="692" width="344" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <nil key="textColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <color key="tintColor" red="0.0" green="0.56904578210000001" blue="0.57461684940000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -104,6 +111,7 @@
                     <connections>
                         <outlet property="datePicker" destination="8qB-Z9-3So" id="ubR-hR-bmc"/>
                         <outlet property="descTextField" destination="xxS-S2-NkD" id="2Gi-t5-5gF"/>
+                        <outlet property="emailTextField" destination="d7B-58-kAu" id="8MQ-lu-vBQ"/>
                         <outlet property="highPriorityBtn" destination="gvD-53-o7j" id="chu-kC-I4X"/>
                         <outlet property="lowPriorityBtn" destination="tlB-qc-rgl" id="w81-pW-h8E"/>
                         <outlet property="mediumPriorityBtn" destination="Ztl-qi-2Ky" id="Tff-rb-nFA"/>

@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5C4F064C234D9420004B698A /* awsconfiguration.json in Resources */ = {isa = PBXBuildFile; fileRef = 5C4F064B234D9420004B698A /* awsconfiguration.json */; };
 		5C4F064E234D97B1004B698A /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F064D234D97B1004B698A /* API.swift */; };
 		5C4F0650234D9856004B698A /* AddItemStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5C4F064F234D9856004B698A /* AddItemStoryboard.storyboard */; };
 		5C4F0655234D990B004B698A /* AddItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F0654234D990B004B698A /* AddItemViewController.swift */; };
+		5C5B104B235CF91E00B6D0AA /* awsconfiguration.json in Resources */ = {isa = PBXBuildFile; fileRef = 5C5B104A235CF91E00B6D0AA /* awsconfiguration.json */; };
 		5CF9AE4A234D9254002980CB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF9AE49234D9254002980CB /* AppDelegate.swift */; };
 		5CF9AE4F234D9254002980CB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5CF9AE4D234D9254002980CB /* Main.storyboard */; };
 		5CF9AE51234D9255002980CB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5CF9AE50234D9255002980CB /* Assets.xcassets */; };
@@ -22,10 +22,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		5C4F064B234D9420004B698A /* awsconfiguration.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = awsconfiguration.json; sourceTree = SOURCE_ROOT; };
 		5C4F064D234D97B1004B698A /* API.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = SOURCE_ROOT; };
 		5C4F064F234D9856004B698A /* AddItemStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = AddItemStoryboard.storyboard; sourceTree = "<group>"; };
 		5C4F0654234D990B004B698A /* AddItemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddItemViewController.swift; sourceTree = "<group>"; };
+		5C5B104A235CF91E00B6D0AA /* awsconfiguration.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = awsconfiguration.json; path = ../../../../Downloads/awsconfiguration.json; sourceTree = "<group>"; };
 		5CF9AE46234D9254002980CB /* Time.ly.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Time.ly.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5CF9AE49234D9254002980CB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5CF9AE4E234D9254002980CB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -108,7 +108,7 @@
 				5C4F0656234D992E004B698A /* Resources */,
 				5C4F064D234D97B1004B698A /* API.swift */,
 				5CF9AE55234D9255002980CB /* Info.plist */,
-				5C4F064B234D9420004B698A /* awsconfiguration.json */,
+				5C5B104A235CF91E00B6D0AA /* awsconfiguration.json */,
 			);
 			path = Time.ly;
 			sourceTree = "<group>";
@@ -192,7 +192,7 @@
 			files = (
 				9FF45BD7234E7CE20020E7E4 /* CustomCellTableViewCell.xib in Resources */,
 				5C4F0650234D9856004B698A /* AddItemStoryboard.storyboard in Resources */,
-				5C4F064C234D9420004B698A /* awsconfiguration.json in Resources */,
+				5C5B104B235CF91E00B6D0AA /* awsconfiguration.json in Resources */,
 				5CF9AE54234D9255002980CB /* LaunchScreen.storyboard in Resources */,
 				5CF9AE51234D9255002980CB /* Assets.xcassets in Resources */,
 				5CF9AE4F234D9254002980CB /* Main.storyboard in Resources */,
