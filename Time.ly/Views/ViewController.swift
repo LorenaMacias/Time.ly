@@ -34,10 +34,8 @@ class ViewController: UIViewController {
             self.setUser(completion: {(email) in
                 self.emailToSend = self.email
                     print("email is " + self.emailToSend)
-
             })
             self.setItem()
-
             self.tableView.register(UINib(nibName: "CustomCellTableViewCell", bundle: .main
             ), forCellReuseIdentifier: "CustomCellTableViewCell")
             btnUI(btn: addItemUIBTN)
@@ -81,6 +79,7 @@ class ViewController: UIViewController {
                 case .signedIn:
                     DispatchQueue.main.async {
                         print("User already signed in")
+                
                     }
                 case .signedOut:
                     self.setCustomUI()
@@ -89,12 +88,17 @@ class ViewController: UIViewController {
                             self.setUser(completion: {(email) in
                                 self.emailToSend = self.email
                                 print("email is " + self.emailToSend)
-
+                                
                             })
-
+                            
                             DispatchQueue.main.async {
                                 print("User signed in")
+                                self.setItem()
+                                self.tableView.register(UINib(nibName: "CustomCellTableViewCell", bundle: .main
+                                ), forCellReuseIdentifier: "CustomCellTableViewCell")
+
                             }
+
                         }
 
                     })
@@ -122,11 +126,8 @@ class ViewController: UIViewController {
     }
     
     @IBAction func signOutBtn(_ sender: Any) {
-//        self.notesArray = []
         AWSMobileClient.sharedInstance().signOut()
         self.userSignIn()
-        
-        
 
     }
     //reads from AWS DynamoDB to store user information in dict
@@ -189,7 +190,6 @@ extension ViewController : UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CustomCellTableViewCell", for: indexPath) as! CustomCellTableViewCell
-        //self.setItem(completion: {(notesArray) in
             print("Size is \(self.notesArray.count)")
             cell.titleLabelCell.text = notesArray[indexPath.row]["title"] as? String
             cell.descLabelCell.text = notesArray[indexPath.row]["desc"] as? String
@@ -211,7 +211,6 @@ extension ViewController : UITableViewDataSource {
                 cell.priorityLabelCell.backgroundColor = UIColor.blue
                 cell.priorityLabelCell.text = ""
             }
-       // } )
         return cell
     }
 
