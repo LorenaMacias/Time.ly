@@ -27,8 +27,9 @@ class ViewController: UIViewController {
     @IBOutlet weak var addItemUIBTN: UIButton!
     
     override func viewDidLoad() {
-        print("viewDidLoad was called here")
+            notesArray = []
             super.viewDidLoad()
+            notesArray = []
             self.userSignIn()
             self.setUser(completion: {(email) in
                 self.emailToSend = self.email
@@ -209,7 +210,6 @@ extension ViewController : UITableViewDataSource {
             else if cell.priorityLabelCell.text == "Low"{
                 cell.priorityLabelCell.backgroundColor = UIColor.blue
                 cell.priorityLabelCell.text = ""
-
             }
        // } )
         return cell
