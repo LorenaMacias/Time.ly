@@ -20,14 +20,14 @@ class ViewController: UIViewController {
 
     typealias FinishedDownload = () -> ()
 
-    
+
     @IBOutlet weak var tableView: UITableView!
-    
-    
+
+
     @IBOutlet weak var addItemUIBTN: UIButton!
-    
+
     override func viewDidLoad() {
-        
+
         print("test68668")
             super.viewDidLoad()
             self.userSignIn()
@@ -67,7 +67,7 @@ class ViewController: UIViewController {
             if let tokens = tokens {
                 self.email = tokens.idToken?.claims?["email"] as! String
                 completion(self.email)
-               
+
             }
         }
     }
@@ -85,7 +85,7 @@ class ViewController: UIViewController {
                         })
                         self.setItem()
                         print("User already signed in : \(self.emailToSend)")
-                
+
                     }
                 case .signedOut:
                     self.setCustomUI()
@@ -123,7 +123,7 @@ class ViewController: UIViewController {
             })
         }
     }
-    
+
     @IBAction func signOutBtn(_ sender: Any) {
         print("Over here5")
 
@@ -133,14 +133,14 @@ class ViewController: UIViewController {
     //reads from AWS DynamoDB to store user information in dict
     func setItem(){
         //Explicit GET
-        
+
         //self.setUser(completion: {(email) in
-            
+
             self.emailToSend = self.email
-            
-            
+
+
             var emailDict : [String : String] =  ["email" : self.emailToSend]
-            
+
             if let urlToPass = URL(string: "https://cwkz97wm3b.execute-api.us-west-2.amazonaws.com/beta/getusernotes") {
                 var urlRequest = URLRequest(url: urlToPass, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
                 urlRequest.httpMethod = "GET"
@@ -151,8 +151,8 @@ class ViewController: UIViewController {
                     print("error2")
                     print(error)
                 }
-                
-                
+
+
                 let taskWithRequest = URLSession.init(configuration: .default)
                 taskWithRequest.dataTask(with: urlRequest) { (data, response, error) in
                     if let response = response {
@@ -163,7 +163,7 @@ class ViewController: UIViewController {
                             let json = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.allowFragments )
                           //  print(json)
                             self.notesArray = json as! [[String : Any]]
-                            
+
                             DispatchQueue.main.async{
                                 self.tableView.reloadData()
                             }
@@ -187,7 +187,7 @@ extension ViewController : UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CustomCellTableViewCell", for: indexPath) as! CustomCellTableViewCell
-            print("Size is \(self.notesArray.count)")
+            // print("Size is \(self.notesArray.count)")
             cell.titleLabelCell.text = notesArray[indexPath.row]["title"] as? String
             cell.descLabelCell.text = notesArray[indexPath.row]["desc"] as? String
             cell.priorityLabelCell.text = notesArray[indexPath.row]["priority"] as? String

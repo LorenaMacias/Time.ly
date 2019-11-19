@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import UserNotifications
 
 class AddItemViewController: UIViewController {
     
@@ -21,6 +22,7 @@ class AddItemViewController: UIViewController {
     
     @IBOutlet weak var emailTextField: UITextField!
     var userEmail : String = ""
+    var trigger = Calendar.current.dateComponents(in: TimeZone.current, from: Date())
 
     
     var titleText : String = ""
@@ -28,9 +30,12 @@ class AddItemViewController: UIViewController {
     var priorityText : String = ""
     var date : String = ""
     var emailList = [String]()
-    
+    var components = DateComponents()
+
 //    var user : String = ""
     override func viewDidLoad() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge], completionHandler: {didAllow, error in})
+        //notif()
         super.viewDidLoad()
         setBtnShadow(btn: highPriorityBtn)
         setBtnShadow(btn: mediumPriorityBtn)
@@ -38,6 +43,10 @@ class AddItemViewController: UIViewController {
         print("Hello user is \(userEmail)")
         
         // Do any additional setup after loading the view.
+    }
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
     }
     //initializes our variables
     func setVariables(){
@@ -126,10 +135,20 @@ class AddItemViewController: UIViewController {
     }
     //passes user entered information to AWS DynamoDB through our lambda func
     @IBAction func addItemBtn(_ sender: Any) {
+        
+        if(titleTextField.text == "" || priorityText == ""){
+            let alert = UIAlertController(title: "Invalid Action Item", message: "You are missing Title and/or priority", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default, handler: { _ in
+                NSLog("The \"OK\" alert occured.")
+            }))
+            self.present(alert, animated: true, completion: nil)
+        }
         setVariables()
         parseEmails()
 
         if isEmailValid() || emailList[0] == "" {
+            expired()
+            notif() 
             print("emaillist size is \(emailList.count)")
             let identifier = UUID().uuidString
             var noteToPass:[String: String] = ["id": identifier, "title": titleText, "desc": descText, "priority": priorityText, "dueDate": date, "createdBy": userEmail, "people": emailList[0]]
@@ -172,8 +191,8 @@ class AddItemViewController: UIViewController {
     }
     
     @IBOutlet weak var datePicker: UIDatePicker!
-    
     @IBAction func datePickerChanged(_ sender: Any) {
+        
         let dateFormatter = DateFormatter()
         
         dateFormatter.dateStyle = DateFormatter.Style.short
@@ -207,4 +226,30 @@ class AddItemViewController: UIViewController {
         return true
     }
     
+    func expired(){
+        let content = UNMutableNotificationContent()
+        content.title = "Your Time.ly item is due!"
+        content.body = titleTextField.text ?? "Empty Title"
+        content.badge = 1
+        let componentsFromDate = Calendar.current.dateComponents(in: TimeZone.current, from: Date())
+        
+        trigger = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: datePicker.date )
+        var t = UNCalendarNotificationTrigger(dateMatching: trigger, repeats: false)
+        var r = UNNotificationRequest(identifier: "any", content: content, trigger: t)
+        UNUserNotificationCenter.current().add(r, withCompletionHandler: nil)
+
+    }
+    func notif(){
+        let content = UNMutableNotificationContent()
+        content.title = "Your Time.ly item is due!"
+        content.body = titleTextField.text ?? "Empty Title"
+        content.badge = 1
+        let componentsFromDate = Calendar.current.dateComponents(in: TimeZone.current, from: Date())
+        
+        trigger = Calendar.current.dateComponents([.year, .month, .day], from: datePicker.date )
+        var t = UNCalendarNotificationTrigger(dateMatching: trigger, repeats: false)
+        var r = UNNotificationRequest(identifier: "any", content: content, trigger: t)
+        UNUserNotificationCenter.current().add(r, withCompletionHandler: nil)
+        
+    }
 }
