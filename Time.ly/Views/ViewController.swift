@@ -190,7 +190,7 @@ extension ViewController : UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CustomCellTableViewCell", for: indexPath) as! CustomCellTableViewCell
-            print("Size is \(self.notesArray.count)")
+            // print("Size is \(self.notesArray.count)")
             cell.titleLabelCell.text = notesArray[indexPath.row]["title"] as? String
             cell.descLabelCell.text = notesArray[indexPath.row]["desc"] as? String
             cell.priorityLabelCell.text = notesArray[indexPath.row]["priority"] as? String
@@ -213,6 +213,7 @@ extension ViewController : UITableViewDataSource {
             }
         return cell
     }
+    
 
 }
 
@@ -222,3 +223,5 @@ extension ViewController : UITableViewDelegate {
         return 129.5
     }
 }
+
+
