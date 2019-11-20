@@ -204,9 +204,8 @@ class ViewController: UIViewController {
                     }
                     }.resume()
             }
-        })
+    };
     }
-}
 //custome Table View and Cells to display data from AWS DynamoDB
 extension ViewController : UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
