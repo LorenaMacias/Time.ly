@@ -147,6 +147,11 @@ class AddItemViewController: UIViewController {
         parseEmails()
 
         if isEmailValid() || emailList[0] == "" {
+            print("we in this bitch")
+            if(emailList[0] == ""){
+                emailList[0] = "empty"
+                print("inside the email if")
+            }
             expired()
             notif() 
             print("emaillist size is \(emailList.count)")
@@ -209,8 +214,6 @@ class AddItemViewController: UIViewController {
     }
     
     func isEmailValid() -> Bool{
-        print("inside isemailvalid")
-        print("size of emailLIst is \(emailList.count)")
         //check for valid emails
         for i in self.emailList{
             let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
@@ -222,7 +225,6 @@ class AddItemViewController: UIViewController {
                 return false
             }
         }
-        print("its trueee")
         return true
     }
     

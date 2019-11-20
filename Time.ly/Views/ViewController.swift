@@ -15,6 +15,8 @@ class ViewController: UIViewController {
 
 
     var notesArray : [[String: Any]] = []
+    var lowArray : [[String: Any]] = []
+    var midArray : [[String: Any]] = []
     var email : String = ""
     var emailToSend : String = ""
 
@@ -90,17 +92,14 @@ class ViewController: UIViewController {
                                 print("email is " + self.emailToSend)
                                 
                             })
-                            
+            
                             DispatchQueue.main.async {
                                 print("User signed in")
                                 self.setItem()
                                 self.tableView.register(UINib(nibName: "CustomCellTableViewCell", bundle: .main
                                 ), forCellReuseIdentifier: "CustomCellTableViewCell")
-
                             }
-
                         }
-
                     })
                 default:
                     AWSMobileClient.default().signOut()
@@ -164,7 +163,26 @@ class ViewController: UIViewController {
                             print(json)
                             self.notesArray = json as! [[String : Any]]
                             
-                            DispatchQueue.main.async{
+                            var temp : [[String: Any]] = []
+
+                            print("es right here \(self.notesArray[0]["priority"])")
+                            for ar in self.notesArray{
+                                if (ar["priority"] as? String == "Medium"){
+                                    self.midArray.append(ar)
+                                }
+                                else if (ar["priority"] as? String == "Low"){
+                                    self.lowArray.append(ar)
+                                }
+                                else{
+                                    temp.append(ar)
+                                }
+                            }
+                            self.notesArray = []
+                            self.notesArray = temp + self.midArray + self.lowArray
+                            self.midArray = []
+                            self.lowArray = []
+                            
+                            DispatchQueue.main.async  {
                                 self.tableView.reloadData()
                             }
                             print(json)
@@ -174,13 +192,8 @@ class ViewController: UIViewController {
                     }
                     }.resume()
             }
-            
         })
-
-        
-       
     }
-
 }
 //custome Table View and Cells to display data from AWS DynamoDB
 extension ViewController : UITableViewDataSource {
@@ -216,7 +229,6 @@ extension ViewController : UITableViewDataSource {
     
 
 }
-
 
 extension ViewController : UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
