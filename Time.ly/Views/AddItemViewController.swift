@@ -171,7 +171,7 @@ class AddItemViewController: UIViewController {
                 let taskWithRequest = URLSession.init(configuration: .default)
                 taskWithRequest.dataTask(with: urlRequest) { (data, response, error) in
                     if let response = response {
-                        print(response)
+                       // print(response)
                     }
                     if let data = data {
                         do {
