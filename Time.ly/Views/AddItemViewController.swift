@@ -50,8 +50,18 @@ class AddItemViewController: UIViewController {
     }
     //initializes our variables
     func setVariables(){
-        titleText = titleTextField.text ?? "Empty Title"
-        descText = descTextField.text ?? "Empty Desc"
+        if titleTextField.text!.isEmpty{
+            titleText = "emtpy"
+        }
+        else{
+            titleText = titleTextField.text!
+        }
+        if descTextField.text!.isEmpty{
+            descText = "emtpy"
+        }
+        else{
+            descText = titleTextField!.text!
+        }
         
         if self.date == "" {
             var date = Date()
