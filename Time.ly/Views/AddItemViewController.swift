@@ -60,7 +60,7 @@ class AddItemViewController: UIViewController {
             descText = "emtpy"
         }
         else{
-            descText = titleTextField!.text!
+            descText = descTextField!.text!
         }
         
         if self.date == "" {
