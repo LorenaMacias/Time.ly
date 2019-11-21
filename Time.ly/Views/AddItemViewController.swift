@@ -34,7 +34,12 @@ class AddItemViewController: UIViewController {
 
 //    var user : String = ""
     override func viewDidLoad() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge], completionHandler: {didAllow, error in})
+//        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge], completionHandler: {didAllow, error in})
+        let center = UNUserNotificationCenter.current()
+        center.requestAuthorization(options: [.alert, .sound])
+        {
+            (granted, error) in
+        }
         //notif()
         super.viewDidLoad()
         setBtnShadow(btn: highPriorityBtn)
@@ -50,12 +55,7 @@ class AddItemViewController: UIViewController {
     }
     //initializes our variables
     func setVariables(){
-        if titleTextField.text!.isEmpty{
-            titleText = "emtpy"
-        }
-        else{
-            titleText = titleTextField.text!
-        }
+        titleText = titleTextField.text ?? "empty"
         if descTextField.text!.isEmpty{
             descText = "emtpy"
         }
@@ -239,9 +239,10 @@ class AddItemViewController: UIViewController {
     }
     
     func expired(){
+
         let content = UNMutableNotificationContent()
         content.title = "Your Time.ly item is due!"
-        content.body = titleTextField.text ?? "Empty Title"
+        content.body = titleText
         content.badge = 1
         let componentsFromDate = Calendar.current.dateComponents(in: TimeZone.current, from: Date())
         
@@ -254,7 +255,7 @@ class AddItemViewController: UIViewController {
     func notif(){
         let content = UNMutableNotificationContent()
         content.title = "Your Time.ly item is due!"
-        content.body = titleTextField.text ?? "Empty Title"
+        content.body = titleText
         content.badge = 1
         let componentsFromDate = Calendar.current.dateComponents(in: TimeZone.current, from: Date())
         

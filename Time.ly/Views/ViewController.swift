@@ -176,7 +176,6 @@ class ViewController: UIViewController {
 
                             var temp : [[String: Any]] = []
 
-                            print("es right here \(self.notesArray[0]["priority"])")
                             for ar in self.notesArray{
                                 if (ar["priority"] as? String == "Medium"){
                                     self.midArray.append(ar)
@@ -216,11 +215,15 @@ extension ViewController : UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CustomCellTableViewCell", for: indexPath) as! CustomCellTableViewCell
             // print("Size is \(self.notesArray.count)")
             cell.titleLabelCell.text = notesArray[indexPath.row]["title"] as? String
+       
             cell.descLabelCell.text = notesArray[indexPath.row]["desc"] as? String
+        
             cell.priorityLabelCell.text = notesArray[indexPath.row]["priority"] as? String
             cell.dateLabelCell.text = notesArray[indexPath.row]["dueDate"] as? String
             cell.priorityLabelCell.isHidden = false
-
+            if cell.descLabelCell.text == "emtpy"{
+                cell.descLabelCell.text = ""
+            }
             if cell.priorityLabelCell.text == "High"{
                 cell.priorityLabelCell.backgroundColor = UIColor.red
                 cell.priorityLabelCell.text = ""
