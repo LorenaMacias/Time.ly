@@ -5,13 +5,12 @@
 //  Created by Kenneth Aguilar on 9/30/19.
 //  Copyright © 2019 AWSStudent. All rights reserved.
 //
-
 import UIKit
 import UserNotifications
 
 class AddItemViewController: UIViewController {
     
-
+    
     @IBOutlet weak var titleTextField: UITextField!
     
     @IBOutlet weak var descTextField: UITextField!
@@ -23,7 +22,7 @@ class AddItemViewController: UIViewController {
     @IBOutlet weak var emailTextField: UITextField!
     var userEmail : String = ""
     var trigger = Calendar.current.dateComponents(in: TimeZone.current, from: Date())
-
+    
     
     var titleText : String = ""
     var descText : String = ""
@@ -31,10 +30,16 @@ class AddItemViewController: UIViewController {
     var date : String = ""
     var emailList = [String]()
     var components = DateComponents()
-
-//    var user : String = ""
+    var newComponents = DateComponents()
+    
+    //    var user : String = ""
     override func viewDidLoad() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge], completionHandler: {didAllow, error in})
+        let center = UNUserNotificationCenter.current()
+        center.requestAuthorization(options: [.alert, .sound, .badge])
+        {
+            (granted, error) in
+        }
+//        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge], completionHandler: {didAllow, error in})
         //notif()
         super.viewDidLoad()
         setBtnShadow(btn: highPriorityBtn)
@@ -73,7 +78,7 @@ class AddItemViewController: UIViewController {
             self.date = dateFormatter.string(from: date)
         }
     }
-
+    
     //allows user to choose a priority level
     @IBAction func setPriorityItemBtn(_ sender: UIButton) {
         if sender.tag == 0 {
@@ -155,7 +160,7 @@ class AddItemViewController: UIViewController {
         }
         setVariables()
         parseEmails()
-
+        
         if isEmailValid() || emailList[0] == "" {
             print("we in this bitch")
             if(emailList[0] == ""){
@@ -163,7 +168,7 @@ class AddItemViewController: UIViewController {
                 print("inside the email if")
             }
             expired()
-            notif() 
+            notif()
             print("emaillist size is \(emailList.count)")
             let identifier = UUID().uuidString
             var noteToPass:[String: String] = ["id": identifier, "title": titleText, "desc": descText, "priority": priorityText, "dueDate": date, "createdBy": userEmail, "people": emailList[0]]
@@ -181,7 +186,7 @@ class AddItemViewController: UIViewController {
                 let taskWithRequest = URLSession.init(configuration: .default)
                 taskWithRequest.dataTask(with: urlRequest) { (data, response, error) in
                     if let response = response {
-                       // print(response)
+                        // print(response)
                     }
                     if let data = data {
                         do {
@@ -207,6 +212,8 @@ class AddItemViewController: UIViewController {
     
     @IBOutlet weak var datePicker: UIDatePicker!
     @IBAction func datePickerChanged(_ sender: Any) {
+        components = datePicker.calendar.dateComponents([.year, .month, .day, .hour, .minute], from: datePicker.date)
+        newComponents = datePicker.calendar.dateComponents([.year, .month, .day], from: datePicker.date)
         
         let dateFormatter = DateFormatter()
         
@@ -239,29 +246,29 @@ class AddItemViewController: UIViewController {
     }
     
     func expired(){
-        let content = UNMutableNotificationContent()
+        
+        let content = UNMutableNotificationContent() //The notification's content
         content.title = "Your Time.ly item is due!"
         content.body = titleTextField.text ?? "Empty Title"
-        content.badge = 1
-        let componentsFromDate = Calendar.current.dateComponents(in: TimeZone.current, from: Date())
-        
-        trigger = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: datePicker.date )
-        var t = UNCalendarNotificationTrigger(dateMatching: trigger, repeats: false)
-        var r = UNNotificationRequest(identifier: "any", content: content, trigger: t)
-        UNUserNotificationCenter.current().add(r, withCompletionHandler: nil)
+        content.sound = UNNotificationSound.default
 
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+        let notificationReq = UNNotificationRequest(identifier: "identifier", content: content, trigger: trigger)
+        UNUserNotificationCenter.current().add(notificationReq, withCompletionHandler: nil)
+        
     }
     func notif(){
+
         let content = UNMutableNotificationContent()
         content.title = "Your Time.ly item is due!"
         content.body = titleTextField.text ?? "Empty Title"
         content.badge = 1
-        let componentsFromDate = Calendar.current.dateComponents(in: TimeZone.current, from: Date())
-        
-        trigger = Calendar.current.dateComponents([.year, .month, .day], from: datePicker.date )
-        var t = UNCalendarNotificationTrigger(dateMatching: trigger, repeats: false)
+        newComponents.hour = 8
+        newComponents.minute = 0
+        var t = UNCalendarNotificationTrigger(dateMatching: newComponents, repeats: false)
         var r = UNNotificationRequest(identifier: "any", content: content, trigger: t)
         UNUserNotificationCenter.current().add(r, withCompletionHandler: nil)
+        
         
     }
 }
