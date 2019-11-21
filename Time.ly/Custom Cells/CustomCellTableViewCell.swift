@@ -23,7 +23,7 @@ class CustomCellTableViewCell: UITableViewCell {
     @IBOutlet weak var dateLabelCell: UILabel!
     
     override func awakeFromNib() {
-        super.awakeFromNib()
+         super.awakeFromNib()
         sendSubviewToBack(priorityLabelCell)
         priorityLabelCell.layer.zPosition = 0;
         titleLabelCell.layer.zPosition = 1;
@@ -37,5 +37,8 @@ class CustomCellTableViewCell: UITableViewCell {
 
         // Configure the view for the selected state
     }
+    
+    
+    
     
 }
