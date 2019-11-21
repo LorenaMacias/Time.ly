@@ -164,9 +164,9 @@ class AddItemViewController: UIViewController {
             }
             expired()
             notif()
-            print("emaillist size is \(emailList.count)")
+            print("Email list \(emailList)")
             let identifier = UUID().uuidString
-            var noteToPass:[String: String] = ["id": identifier, "title": titleText, "desc": descText, "priority": priorityText, "dueDate": date, "createdBy": userEmail, "people": emailList[0]]
+            var noteToPass:[String: Any] = ["id": identifier, "title": titleText, "desc": descText, "priority": priorityText, "dueDate": date, "createdBy": userEmail, "people": emailList]
             //Explicit GET
             if let urlToPass = URL(string: "https://cwkz97wm3b.execute-api.us-west-2.amazonaws.com/beta/additem") {
                 var urlRequest = URLRequest(url: urlToPass, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
