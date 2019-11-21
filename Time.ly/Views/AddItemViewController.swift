@@ -154,13 +154,19 @@ class AddItemViewController: UIViewController {
             self.present(alert, animated: true, completion: nil)
         }
         setVariables()
-        parseEmails()
+            parseEmails()
         
         if isEmailValid() || emailList[0] == "" {
             print("we in this bitch")
             if(emailList[0] == ""){
                 emailList[0] = "empty"
-                print("inside the email if")
+            }
+            let current = datePicker.calendar.dateComponents([.year, .month, .day, .hour, .minute], from: datePicker.date)
+            if(current == components){
+                print("they are the same dates")
+            }
+            else{
+                print("they are not the same")
             }
             expired()
             notif()
