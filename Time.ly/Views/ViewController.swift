@@ -4,25 +4,24 @@
 //
 //  Created by Lorena Macias on 9/30/19.
 //  Copyright © 2019 AWSStudent. All rights reserved.
-
 import UIKit
 import AWSMobileClient
 import AWSAppSync
 import AWSUserPoolsSignIn
 
 class ViewController: UIViewController {
-    
-    
+
+
     var notesArray : [[String: Any]] = []
     var lowArray : [[String: Any]] = []
     var midArray : [[String: Any]] = []
     var email : String = ""
     var emailToSend : String = ""
-    
+
     typealias FinishedDownload = () -> ()
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var addItemUIBTN: UIButton!
-    
+
     override func viewDidLoad() {
         notesArray = []
         super.viewDidLoad()
@@ -83,7 +82,7 @@ class ViewController: UIViewController {
                                 self.emailToSend = self.email
                                 print("email is " + self.emailToSend)
                             })
-                            
+
                             DispatchQueue.main.async {
                                 print("User signed in")
                                 self.setItem()
@@ -95,7 +94,7 @@ class ViewController: UIViewController {
                 default:
                     AWSMobileClient.default().signOut()
                 }
-                
+
             } else if let error = error {
                 print(error.localizedDescription)
             }
@@ -108,12 +107,12 @@ class ViewController: UIViewController {
         {
             let vc = segue.destination as? AddItemViewController
             self.setUser(completion: {(email) in
-                
+
                 vc?.userEmail = self.email
             })
         }
     }
-    
+
     @IBAction func signOutBtn(_ sender: Any) {
         AWSMobileClient.sharedInstance().signOut()
         self.userSignIn()
@@ -124,7 +123,7 @@ class ViewController: UIViewController {
         self.setUser(completion: {(email) in
             self.emailToSend = self.email
             var emailDict : [String : String] =  ["email" : self.emailToSend]
-            
+
             if let urlToPass = URL(string: "https://cwkz97wm3b.execute-api.us-west-2.amazonaws.com/beta/getusernotes") {
                 var urlRequest = URLRequest(url: urlToPass, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
                 urlRequest.httpMethod = "GET"
@@ -134,7 +133,7 @@ class ViewController: UIViewController {
                 catch {
                     print(error)
                 }
-                
+
                 let taskWithRequest = URLSession.init(configuration: .default)
                 taskWithRequest.dataTask(with: urlRequest) { (data, response, error) in
                     if let response = response {
@@ -145,9 +144,9 @@ class ViewController: UIViewController {
                             let json = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.allowFragments )
                             print(json)
                             self.notesArray = json as! [[String : Any]]
-                            
+
                             var temp : [[String: Any]] = []
-                            
+
                             for ar in self.notesArray{
                                 if (ar["priority"] as? String == "Medium"){
                                     self.midArray.append(ar)
@@ -163,7 +162,7 @@ class ViewController: UIViewController {
                             self.notesArray = temp + self.midArray + self.lowArray
                             self.midArray = []
                             self.lowArray = []
-                            
+
                             DispatchQueue.main.async  {
                                 self.tableView.reloadData()
                             }
@@ -182,14 +181,14 @@ extension ViewController : UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return notesArray.count
     }
-    
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CustomCellTableViewCell", for: indexPath) as! CustomCellTableViewCell
         // print("Size is \(self.notesArray.count)")
         cell.titleLabelCell.text = notesArray[indexPath.row]["title"] as? String
-        
+
         cell.descLabelCell.text = notesArray[indexPath.row]["desc"] as? String
-        
+
         cell.priorityLabelCell.text = notesArray[indexPath.row]["priority"] as? String
         cell.dateLabelCell.text = notesArray[indexPath.row]["dueDate"] as? String
         cell.priorityLabelCell.isHidden = false
@@ -203,7 +202,7 @@ extension ViewController : UITableViewDataSource {
         else if cell.priorityLabelCell.text == "Medium"{
             cell.priorityLabelCell.backgroundColor = UIColor.orange
             cell.priorityLabelCell.text = ""
-            
+
         }
         else if cell.priorityLabelCell.text == "Low"{
             cell.priorityLabelCell.backgroundColor = UIColor.blue
@@ -211,28 +210,28 @@ extension ViewController : UITableViewDataSource {
         }
         return cell
     }
-    
+
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         return true
     }
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            
+
             //Handle delete
             let cell =  tableView.cellForRow(at: indexPath)
             var currentData = notesArray[indexPath.row]
             print("Current Data: \(currentData)")
-            
+
             notesArray.remove(at: indexPath.row)
-            
-            
+
+
             guard let deleteID = currentData["id"] as? String else{return}
             self.deleteNoteAPICall(noteId: deleteID)
             DispatchQueue.main.async {
                 tableView.reloadData()
             }
-            
-            
+
+
             //Send note and key to lambda and delete from db
             //Delete cell from the uitableview
         }
@@ -246,17 +245,17 @@ extension ViewController : UITableViewDelegate {
 }
 
 extension ViewController { //Networking
-    
-    
+
+
     func deleteNoteAPICall(noteId: String) {
-        
+
         if let urlToPass = URL(string: "https://cwkz97wm3b.execute-api.us-west-2.amazonaws.com/beta/delete-note") {
             var urlRequest = URLRequest(url: urlToPass, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
             urlRequest.httpMethod = "POST"
-            
+
             urlRequest.httpBody = noteId.data(using: .utf8);
                 //JSONSerialization.data(withJSONObject: emailDict, options: JSONSerialization.WritingOptions())
-            
+
             let taskWithRequest = URLSession.init(configuration: .default)
             taskWithRequest.dataTask(with: urlRequest) { (data, response, error) in
                 if let response = response {
@@ -266,7 +265,7 @@ extension ViewController { //Networking
                     do {
                         print("Success")
                         //let json = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.allowFragments )
-                        
+
                         //DispatchQueue.main.async  {
                         //    self.tableView.reloadData()
                         //}
