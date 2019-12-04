@@ -23,7 +23,7 @@ What things you need to install the software and how to install them
 
 ## Built With
 
-• Amazon Web Services Incognito\
+• Incognito AWS\
 • Dynamo DB\
 • Amplify AWS\
 • XCode
