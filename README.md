@@ -12,7 +12,7 @@ What things you need to install the software and how to install them
 
 • a MacOS device (running at least El Capitan)\
 • XCode version 12 or above\
-• iPhone XR or above (optional for deployment on physical device)\
+• iPhone XR or above (optional for deployment on physical device)
 
 ## Deployment
 
@@ -26,7 +26,7 @@ What things you need to install the software and how to install them
 • Amazon Web Services Incognito\
 • Dynamo DB\
 • Amplify AWS\
-• XCode\
+• XCode
 
 
 ## Authors
