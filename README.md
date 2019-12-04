@@ -10,9 +10,9 @@ These instructions will get you a copy of the project up and running on your loc
 
 What things you need to install the software and how to install them
 
-• a MacOS device (running at least El Capitan)
-• XCode version 12 or above
-• iPhone XR or above (optional for deployment on physical device)
+• a MacOS device (running at least El Capitan)\
+• XCode version 12 or above\
+• iPhone XR or above (optional for deployment on physical device)\
 
 ## Deployment
 
@@ -23,10 +23,10 @@ What things you need to install the software and how to install them
 
 ## Built With
 
-• Amazon Web Services Incognito
-• Dynamo DB
-• Amplify AWS
-• XCode
+• Amazon Web Services Incognito\
+• Dynamo DB\
+• Amplify AWS\
+• XCode\
 
 
 ## Authors
