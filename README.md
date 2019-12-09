@@ -35,3 +35,7 @@ What things you need to install the software and how to install them
 * **Kenneth Aguilar** - [K-ennethA](https://github.com/K-ennethA)
 * **Lorena Macias** – [LorenaMacias](https://github.com/LorenaMacias)
 * **Ethan Narciso** – [ENarcs](https://github.com/enarcs)
+
+## Demo playlist
+
+https://www.youtube.com/playlist?list=PLpd2cBNcuKmw01fOR6tdqsSsJdhWxBfZa
