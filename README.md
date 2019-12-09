@@ -1,6 +1,6 @@
 # Time.ly
 
-”Time.ly” is a calendar-based mobile application which helps its user better manage and delegate their time with its user-friendly interface, and unique “Time-Assign” feature. Users can create, manage, and delegate their priorities using “event cards.” Each event card contains details pertaining to each event as well as a priority level for the event.
+”Time.ly” is a calendar-based mobile application which helps its user better manage and delegate their time with its user-friendly interface, and unique “Time-Assign” feature. Users can create, manage, and delegate priorities to self and other users using “event cards.” Each event card contains details pertaining to each event as well as a priority level for the event.
 
 ## Getting Started
 
