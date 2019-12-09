@@ -32,7 +32,6 @@ class AddItemViewController: UIViewController {
     var components = DateComponents()
     var newComponents = DateComponents()
     
-    //    var user : String = ""
     override func viewDidLoad() {
         let center = UNUserNotificationCenter.current()
         center.requestAuthorization(options: [.alert, .sound, .badge])
@@ -45,8 +44,7 @@ class AddItemViewController: UIViewController {
         setBtnShadow(btn: highPriorityBtn)
         setBtnShadow(btn: mediumPriorityBtn)
         setBtnShadow(btn: lowPriorityBtn)
-        print("Hello user is \(userEmail)")
-        
+
         // Do any additional setup after loading the view.
     }
     override func didReceiveMemoryWarning() {
@@ -62,7 +60,7 @@ class AddItemViewController: UIViewController {
         else{
             descText = descTextField!.text!
         }
-        
+        //set the date
         if self.date == "" {
             var date = Date()
             let dateFormatter = DateFormatter()
@@ -76,6 +74,8 @@ class AddItemViewController: UIViewController {
     
     //allows user to choose a priority level
     @IBAction func setPriorityItemBtn(_ sender: UIButton) {
+        //0 for high, 1 for medium, 2 for low
+        
         if sender.tag == 0 {
             priorityText = "High"
             invertColor(btn: highPriorityBtn, priority: "High")
@@ -145,7 +145,6 @@ class AddItemViewController: UIViewController {
     }
     //passes user entered information to AWS DynamoDB through our lambda func
     @IBAction func addItemBtn(_ sender: Any) {
-        
         if(titleTextField.text == "" || priorityText == ""){
             let alert = UIAlertController(title: "Invalid Action Item", message: "You are missing Title and/or priority", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default, handler: { _ in
@@ -157,67 +156,71 @@ class AddItemViewController: UIViewController {
             parseEmails()
         
         if isEmailValid() || emailList[0] == "" {
-            print("we in this bitch")
             if(emailList[0] == ""){
                 emailList[0] = "empty"
             }
-            let current = datePicker.calendar.dateComponents([.year, .month, .day, .hour, .minute], from: datePicker.date)
-            if(current == components){
-                print("they are the same dates")
-            }
-            else{
-                print("they are not the same")
+            //add the person that made the email
+            addToDynamoDB(person: userEmail)
+            //add the rest of the people
+            if(emailList[0] != "empty"){
+                for user in emailList{
+                    addToDynamoDB(person: user)
+                }
             }
             expired()
             notif()
-            print("Email list \(emailList)")
-            let identifier = UUID().uuidString
-            var noteToPass:[String: Any] = ["id": identifier, "title": titleText, "desc": descText, "priority": priorityText, "dueDate": date, "createdBy": userEmail, "people": emailList]
-            //Explicit GET
-            if let urlToPass = URL(string: "https://cwkz97wm3b.execute-api.us-west-2.amazonaws.com/beta/additem") {
-                var urlRequest = URLRequest(url: urlToPass, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
-                urlRequest.httpMethod = "POST"
-                do{urlRequest.httpBody = try JSONSerialization.data(withJSONObject: noteToPass, options: JSONSerialization.WritingOptions())} catch{
-                    print(error)
-                }
-                
-                //urlRequest.allHTTPHeaderFields = ["X-RapidAPI-Host": "restcountries-v1.p.rapidapi.com", "X-RapidAPI-Key": "ddf00969d6msh66c55091085b512p179bbfjsn36f1a8a81ed6"]
-                // https://restcountries-v1.p.rapidapi.com/all
-                
-                let taskWithRequest = URLSession.init(configuration: .default)
-                taskWithRequest.dataTask(with: urlRequest) { (data, response, error) in
-                    if let response = response {
-                        // print(response)
-                    }
-                    if let data = data {
-                        do {
-                            let json = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.allowFragments)
-                            print(json)
-                            
-                        } catch {
-                            print(error)
-                        }
-                    }
-                    }.resume()
-            }
         }
+        //alert users that entered invalid emails
         else{
             let alert = UIAlertController(title: "Alert", message: "Invalid Email", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default, handler: { _ in
                 NSLog("The \"OK\" alert occured.")
             }))
-            self.present(alert, animated: true, completion: nil)
+            self.present(alert, animated: true, completion: nil);
+        } 
+    }
+    
+    func addToDynamoDB(person: String ){
+        //create unique identifier
+        let identifier = UUID().uuidString
+        //set all variables to be passed into DunamoDB
+        var noteToPass:[String: Any] = ["id": identifier, "title": titleText, "desc": descText, "priority": priorityText, "dueDate": date, "createdBy": person, "people": emailList]
+        //Explicit GET
+        if let urlToPass = URL(string: "https://cwkz97wm3b.execute-api.us-west-2.amazonaws.com/beta/additem") {
+            var urlRequest = URLRequest(url: urlToPass, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
+            urlRequest.httpMethod = "POST"
+            do{urlRequest.httpBody = try JSONSerialization.data(withJSONObject: noteToPass, options: JSONSerialization.WritingOptions())} catch{
+                print(error)
+            }
+            
+            //urlRequest.allHTTPHeaderFields = ["X-RapidAPI-Host": "restcountries-v1.p.rapidapi.com", "X-RapidAPI-Key": "ddf00969d6msh66c55091085b512p179bbfjsn36f1a8a81ed6"]
+            // https://restcountries-v1.p.rapidapi.com/all
+            
+            let taskWithRequest = URLSession.init(configuration: .default)
+            taskWithRequest.dataTask(with: urlRequest) { (data, response, error) in
+                if let response = response {
+                    // print(response)
+                }
+                if let data = data {
+                    do {
+                        let json = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.allowFragments)
+                        print(json)
+                        
+                    } catch {
+                        print(error)
+                    }
+                }
+                }.resume()
         }
-        
     }
     
     @IBOutlet weak var datePicker: UIDatePicker!
     @IBAction func datePickerChanged(_ sender: Any) {
+        //grab the date the user last entered into the datepicker
         components = datePicker.calendar.dateComponents([.year, .month, .day, .hour, .minute], from: datePicker.date)
         newComponents = datePicker.calendar.dateComponents([.year, .month, .day], from: datePicker.date)
         
         let dateFormatter = DateFormatter()
-        
         dateFormatter.dateStyle = DateFormatter.Style.short
         dateFormatter.timeStyle = DateFormatter.Style.short
         
@@ -225,10 +228,10 @@ class AddItemViewController: UIViewController {
     }
     
     func parseEmails(){
+        //seperate all emails entered by commas ,
         var emailTemp : String = ""
         emailTemp = emailTextField.text ?? ""
         self.emailList = emailTemp.components(separatedBy: ", ")
-        
     }
     
     func isEmailValid() -> Bool{
@@ -246,8 +249,8 @@ class AddItemViewController: UIViewController {
         return true
     }
     
+    //set a notification when the action item expires
     func expired(){
-        
         let content = UNMutableNotificationContent() //The notification's content
         content.title = "Your Time.ly item is due!"
         content.body = titleTextField.text ?? "Empty Title"
@@ -258,19 +261,35 @@ class AddItemViewController: UIViewController {
         UNUserNotificationCenter.current().add(notificationReq, withCompletionHandler: nil)
         
     }
+    //set a notification the day the action item is due
     func notif(){
-        
         let content = UNMutableNotificationContent()
-        content.title = "Your Time.ly item is due!"
+        content.title = "Reminder: your Time.ly item is due today!"
         content.body = titleText
+        //set notification for 8:00am day it is due
         content.badge = 1
         newComponents.hour = 8
-        newComponents.minute = 0
-        var t = UNCalendarNotificationTrigger(dateMatching: newComponents, repeats: false)
-        var r = UNNotificationRequest(identifier: "any", content: content, trigger: t)
+        newComponents.minute = 00
+        let t = UNCalendarNotificationTrigger(dateMatching: newComponents, repeats: false)
+        let r = UNNotificationRequest(identifier: "any", content: content, trigger: t)
         UNUserNotificationCenter.current().add(r, withCompletionHandler: nil)
+    }
+    
+    //loading screen when everything is still loading up
+    func createSpinnerView() {
+        let child = SpinnerViewController()
         
-        
+        // add the spinner view controller
+        addChild(child)
+        child.view.frame = view.frame
+        view.addSubview(child.view)
+        child.didMove(toParent: self)
+        // wait two seconds to simulate some work happening
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            // then remove the spinner view controller
+            child.willMove(toParent: nil)
+            child.view.removeFromSuperview()
+            child.removeFromParent()
+        }
     }
 }
-

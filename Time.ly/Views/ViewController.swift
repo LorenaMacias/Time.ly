@@ -23,13 +23,14 @@ class ViewController: UIViewController {
     @IBOutlet weak var addItemUIBTN: UIButton!
 
     override func viewDidLoad() {
+//        createSpinnerView()
         notesArray = []
         super.viewDidLoad()
         notesArray = []
         self.userSignIn()
         self.setUser(completion: {(email) in
             self.emailToSend = self.email
-            print("email is " + self.emailToSend)
+//            print("email is " + self.emailToSend)
         })
         self.setItem()
         self.tableView.register(UINib(nibName: "CustomCellTableViewCell", bundle: .main
@@ -52,7 +53,7 @@ class ViewController: UIViewController {
                         signInUIOptions: SignInUIOptions(
                             canCancel: false,
                             logoImage: UIImage(named: "timelyLogo"),
-                            backgroundColor: UIColor(red:0.00, green:0.50, blue:0.50, alpha:1.0))) { (result, err) in
+                            backgroundColor: UIColor(red:1.00, green:1.00, blue:1.00, alpha:1.0))) { (result, err) in
         }
     }
     //handles issue of email being setting to Nil
@@ -84,7 +85,6 @@ class ViewController: UIViewController {
                             })
 
                             DispatchQueue.main.async {
-                                print("User signed in")
                                 self.setItem()
                                 self.tableView.register(UINib(nibName: "CustomCellTableViewCell", bundle: .main
                                 ), forCellReuseIdentifier: "CustomCellTableViewCell")
@@ -123,7 +123,6 @@ class ViewController: UIViewController {
         self.setUser(completion: {(email) in
             self.emailToSend = self.email
             var emailDict : [String : String] =  ["email" : self.emailToSend]
-
             if let urlToPass = URL(string: "https://cwkz97wm3b.execute-api.us-west-2.amazonaws.com/beta/getusernotes") {
                 var urlRequest = URLRequest(url: urlToPass, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
                 urlRequest.httpMethod = "GET"
@@ -133,7 +132,6 @@ class ViewController: UIViewController {
                 catch {
                     print(error)
                 }
-
                 let taskWithRequest = URLSession.init(configuration: .default)
                 taskWithRequest.dataTask(with: urlRequest) { (data, response, error) in
                     if let response = response {
@@ -146,7 +144,7 @@ class ViewController: UIViewController {
                             self.notesArray = json as! [[String : Any]]
 
                             var temp : [[String: Any]] = []
-
+                            //adds items based on priority
                             for ar in self.notesArray{
                                 if (ar["priority"] as? String == "Medium"){
                                     self.midArray.append(ar)
@@ -175,13 +173,14 @@ class ViewController: UIViewController {
             }
         })
     }
+    
 }
 //custome Table View and Cells to display data from AWS DynamoDB
 extension ViewController : UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return notesArray.count
     }
-
+//sets each cell to include title, description priority, and due date
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CustomCellTableViewCell", for: indexPath) as! CustomCellTableViewCell
         // print("Size is \(self.notesArray.count)")
@@ -192,9 +191,12 @@ extension ViewController : UITableViewDataSource {
         cell.priorityLabelCell.text = notesArray[indexPath.row]["priority"] as? String
         cell.dateLabelCell.text = notesArray[indexPath.row]["dueDate"] as? String
         cell.priorityLabelCell.isHidden = false
+        
+        //if theres no description then do not dispay a desription
         if cell.descLabelCell.text == "emtpy"{
             cell.descLabelCell.text = ""
         }
+        //changes color based on priority
         if cell.priorityLabelCell.text == "High"{
             cell.priorityLabelCell.backgroundColor = UIColor.red
             cell.priorityLabelCell.text = ""
@@ -230,10 +232,7 @@ extension ViewController : UITableViewDataSource {
             DispatchQueue.main.async {
                 tableView.reloadData()
             }
-
-
-            //Send note and key to lambda and delete from db
-            //Delete cell from the uitableview
+            
         }
     }
 }
@@ -244,17 +243,16 @@ extension ViewController : UITableViewDelegate {
     }
 }
 
+
 extension ViewController { //Networking
-
-
+    //Send note and key to lambda and delete from db
+    //Delete cell from the uitableview
     func deleteNoteAPICall(noteId: String) {
-
         if let urlToPass = URL(string: "https://cwkz97wm3b.execute-api.us-west-2.amazonaws.com/beta/delete-note") {
             var urlRequest = URLRequest(url: urlToPass, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
             urlRequest.httpMethod = "POST"
 
             urlRequest.httpBody = noteId.data(using: .utf8);
-                //JSONSerialization.data(withJSONObject: emailDict, options: JSONSerialization.WritingOptions())
 
             let taskWithRequest = URLSession.init(configuration: .default)
             taskWithRequest.dataTask(with: urlRequest) { (data, response, error) in
@@ -264,12 +262,7 @@ extension ViewController { //Networking
                 if let data = data {
                     do {
                         print("Success")
-                        //let json = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.allowFragments )
 
-                        //DispatchQueue.main.async  {
-                        //    self.tableView.reloadData()
-                        //}
-                       // print(json)
                     } catch {
                         print(error)
                     }
